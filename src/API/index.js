@@ -6,6 +6,12 @@ var cors = require('cors');
 
 
 const API_ENDPOINT = "";
+const config = {
+    host: 'localhost',
+    user: 'dba',
+    password: 'inevitable',
+    database: 'codegiant'
+};
 
 // MIDDLEWARE
 app.use(express.json());
@@ -89,10 +95,31 @@ let tracks = [];
             let password = req.query.password;
             console.log('log in - userid: ', userid);
             console.log('log in - password: ', password);
-            let result = {
-                role: "developer"
-            };
-            res.json(result);
+
+            var connection = mysql.createConnection(config);
+            connection.connect(function(err) {
+                if (err) throw err;
+                console.log("CONNECTED TO DB!");
+            });
+
+            let sql = `
+                SELECT *
+	            FROM users
+                WHERE name = '${userid}' AND password = '${password}';
+            `;
+
+            connection.query(sql, (err, result, fields) => {
+                if (err) throw err;
+                console.log(result);
+                let queryResult = result[0];
+                let send = {
+                    role: queryResult.type,
+                    userid: queryResult.user_id
+                };
+                res.json(send);
+            });
+             
+            connection.end();
         });
         
         // completed-tracks get //DATABASE CONNECTION
@@ -207,18 +234,6 @@ const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`Listening on port ${port}...`));
 
 
-var connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'dba',
-    password: 'inevitable',
-    database: 'codegiant'
-});
-
-connection.connect(function(err) {
-    if (err) throw err;
-    console.log("CONNECTED TO DB!");
-});
-
 let createUserSql = `
 INSERT INTO users (name, email, password, birth_date)
 	VALUES (
@@ -248,14 +263,14 @@ connection.query(sql, (err, result, fields) => {
  */
 
 
-
+/**
 connection.query("SELECT * FROM USER_TYPE", (err, result, fields) => {
     if (err) throw err;
     console.log(result);
 });
  
 connection.end();
-
+ */
 
 
 

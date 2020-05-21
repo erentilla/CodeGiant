@@ -1,7 +1,11 @@
-INSERT INTO users (name, email, password, birth_date)
+INSERT INTO users (name, email, password, birth_date, type)
 	VALUES (
-            'tilla',
-            'tilla@t.com',
-            '1234',
-            '2015-01-10'
-	)
+			'tilla',
+            'tilla@gmail.com',
+            '12312312',
+            '2010-10-10',
+            'adm'
+	);
+
+DELETE FROM USERS WHERE type = 'adm';
+SELECT * FROM USERS
