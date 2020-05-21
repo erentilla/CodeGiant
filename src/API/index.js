@@ -4,27 +4,15 @@ const app = express();
 var mysql = require('mysql');
 
 
-
-
 // MIDDLEWARE
 app.use(express.json());
 
 // VARS
-
-
 let users  = [];
 let tracks = [];
 
 
 {//////////////////////////////////////// ROUTES
-    
-    /**
-    app.get('/', (req, res) => {
-        res.send('Home');
-    });
-    */
-    
-    // MAIN ROUTES
     
     {// USER ROUTES
         // user get
@@ -38,7 +26,7 @@ let tracks = [];
             if(error) return res.status(400).send(result.error.details[0].message);
             
             let user = {
-                userID: req.body.userID,
+                userid: req.body.userid,
                 username: req.body.username,
                 password: req.body.password,
                 role: req.body.role
@@ -60,8 +48,8 @@ let tracks = [];
             if(error) return res.status(400).send(result.error.details[0].message);
             
             let track = {
-                trackID     : req.body.trackID,
-                trackName   : req.body.trackName,
+                id     : req.body.id,
+                name        : req.body.name,
                 subject     : req.body.subject,
                 difficulty  : req.body.difficulty,
                 duration    : req.body.duration 
@@ -74,36 +62,36 @@ let tracks = [];
     {// EXTRA ROUTES
         // log-in get
         app.get('/api/log-in', (req, res) => {
-            let user = users.find(c => c.userID == req.query.userID && c.password == req.query.password);
+            let user = users.find(c => c.userid == req.query.userid && c.password == req.query.password);
             if (!user) res.status(400).send('The user with the given parameters is not found.');
             res.json({role: user.role});
         });
         
         // completed-tracks get //DATABASE CONNECTION
         app.get('/api/completed-tracks', (req, res) => {
-            let user = users.find(c => c.userID == req.query.userID);
+            let user = users.find(c => c.userid == req.query.userid);
             if (!user) res.status(400).send('The tracks with the given parameters are not found.');
             res.json({tracks: []});
         });
         
         // questions-of-track //DATABASE CONNECTION
         app.get('/api/questions-of-track', (req, res) => {
-            let track = tracks.tracks.find(c => c.trackID == req.query.trackID);
+            let track = tracks.tracks.find(c => c.id == req.query.id);
             if (!track) res.status(400).send('The track with the given parameters is not found.');
             res.json({questions: []});
         });
         
         // report get //DATABASE CONNECTION
         app.get('/api/report', (req, res) => {
-            let user  = users.find(c => c.userID == req.query.userID);
-            let track = tracks.tracks.find(c =>c.trackID == req.query.trackID);
+            let user  = users.find(c => c.userid == req.query.userid);
+            let track = tracks.tracks.find(c =>c.id == req.query.id);
             if (!user || !track) res.status(400).send('The report with the given parameters are not found.');
             res.json({total_score: '0'});
         });
         
         // submit-track get PROBLEMATIC
         app.post('/api/submit-track', (req, res) => {
-            let track = req.params;
+            let track = req.params.userid;
             tracks.tracks.push(track);
             //res.send({submission: [track.body]});
         });
@@ -117,7 +105,7 @@ let tracks = [];
 // user validation
 function validateUser(user){
     let schema = {
-        userID  : Joi.string().required(),
+        userid  : Joi.string().required(),
         username: Joi.string().required(),
         password: Joi.string().required(),
         role:     Joi.string().required()
@@ -129,8 +117,8 @@ function validateUser(user){
 // user validation
 function validateTrack(track){
     let schema = {
-        trackID     : Joi.string().required(),
-        trackName   : Joi.string().required(),
+        id          : Joi.string().required(),
+        name        : Joi.string().required(),
         subject     : Joi.string().required(),
         difficulty  : Joi.string().required(),
         duration    : Joi.string().required()
@@ -193,26 +181,3 @@ connection.query("SELECT * FROM USER_TYPE", (err, result, fields) => {
 });
  
 connection.end();
-
-
-
-
-
-/**
-app.put('/api/users/:username', (req, res) => {
-    //Look up
-    let user = users.find(c => c.username == req.params.username);
-    if (!user) res.status(400).send('The user with the given parameters is not found.');
-    
-    //Validate
-    const {error} = validateUser(req.body); // result.error
-    if(error){
-        res.status(400).send(result.error.details[0].message);
-        return;
-    }
-    
-    //Update & Return
-    user.username = req.body.name;
-    res.send(course);
-});
-*/
