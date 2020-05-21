@@ -5,12 +5,12 @@ DROP USER IF EXISTS 'admin';
 DROP USER IF EXISTS 'dba';
 
 -- Authentification
-CREATE USER 'patrol' IDENTIFIED BY 'stop';
+CREATE USER 'patrol' IDENTIFIED WITH mysql_native_password BY 'stop';
 GRANT SELECT, INSERT ON codegiant.users TO 'patrol';
 GRANT SELECT, INSERT ON codegiant.user_type TO 'patrol';
 
 -- Privileges of developer users
-CREATE USER 'dev' IDENTIFIED BY 'giant';
+CREATE USER 'dev' IDENTIFIED WITH mysql_native_password BY 'giant';
 GRANT SELECT, INSERT, UPDATE, DELETE ON codegiant.comments TO 'dev';
 GRANT SELECT ON codegiant.company TO 'dev';
 GRANT SELECT ON codegiant.consists_of TO 'dev';
@@ -30,7 +30,7 @@ GRANT SELECT ON codegiant.user_type TO 'dev';
 GRANT SELECT, UPDATE ON codegiant.users TO 'dev';
 
 -- Privileges of representative users
-CREATE USER 'representative' IDENTIFIED BY 'hired';
+CREATE USER 'representative' IDENTIFIED WITH mysql_native_password BY 'hired';
 GRANT SELECT, INSERT, UPDATE, DELETE ON codegiant.comments TO 'representative';
 GRANT SELECT, UPDATE ON codegiant.company TO 'representative';
 GRANT SELECT, INSERT, DELETE ON codegiant.consists_of TO 'representative';
@@ -51,7 +51,7 @@ GRANT SELECT ON codegiant.user_type TO 'representative';
 GRANT SELECT, UPDATE ON codegiant.users TO 'representative';
 
 -- Privileges of admin users
-CREATE USER 'admin' IDENTIFIED BY 'bruh';
+CREATE USER 'admin' IDENTIFIED WITH mysql_native_password BY 'bruh';
 GRANT SELECT, INSERT, UPDATE, DELETE ON codegiant.comments TO 'admin';
 GRANT SELECT, INSERT, UPDATE, DELETE ON codegiant.company TO 'admin';
 GRANT SELECT, INSERT, DELETE ON codegiant.consists_of TO 'admin';
@@ -72,5 +72,5 @@ GRANT SELECT, UPDATE ON codegiant.user_type TO 'admin';
 GRANT SELECT, UPDATE ON codegiant.users TO 'admin';
 
 -- Privileges of dba
-CREATE USER 'dba' IDENTIFIED BY 'inevitable';
+CREATE USER 'dba' IDENTIFIED WITH mysql_native_password BY 'inevitable';
 GRANT ALL ON codegiant.* TO 'dba';
