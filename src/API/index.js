@@ -291,18 +291,19 @@ app.get('/interviews', (req, res) => {
 
     let sql = `
             SELECT request_id AS interview_id, company.name AS company_title, deadline, job_desc AS job_description
-        FROM interview_request, represents, company
-            WHERE sender_id = ${user_id}
+            FROM interview_request, represents, company
+            WHERE sender_id = ${userid}
             AND interview_request.sender_id = represents.representative_id
-                AND represents.company_id = company.company_id
+            AND represents.company_id = company.company_id
         `;
     database.query(sql).then(result => {
         let send = {
             interviews: result
         };
         res.json(send);
-    })
-    database.close();
+    }).then(() => {
+        database.close();
+    });
 });
 
 // FUNCTIONS
