@@ -91,7 +91,7 @@ app.get('/log-in', (req, res) => {
     let sql = `
         SELECT *
         FROM users
-        WHERE name = '${username}' AND password = '${password}';
+        WHERE name = '${username}' AND password = '${password}'
     `; 
 
     database.query(sql).then((result) => {
@@ -109,6 +109,33 @@ app.get('/log-in', (req, res) => {
     }).then(() => {
         database.close();
     });
+});
+
+// signup get
+app.post('/sign-up', (req, res) => {
+
+    let name = req.query.name;
+    let email = req.query.email;
+    let password = req.query.password;
+    let birth_date = req.query.birth_date;
+    let role = req.query.role;
+
+    let database = new Database(config);
+
+    let sql = `
+        INSERT INTO users (name, email, password, birth_date, type)
+	    VALUES (
+			'${name}',
+            '${email}',
+            '${password}',
+            '${birth_date}',
+            '${role}'
+	        )
+    `; 
+
+    database.query(sql);
+    database.close();
+    res.send();
 });
 
 app.get('/questions', (req, res) => {
@@ -268,17 +295,24 @@ app.post('/submit-track', (req, res) => {
 app.get('/leaderboard', (req, res) => {
     let notFound = false;
     if (notFound) res.status(400).send('The leaderboard with the given parameters are not found.');
-    let trackid = req.query.trackid;
-    console.log("leaderboard - trackid: ", trackid);
-    let result = {
-        "leaderboard": [
-            {"user_id": "baba", "score": 100},
-            {"user_id": "mehmet", "score": 70},
-            {"user_id": "lmao", "score": 50},
-            {"user_id": "alko", "score": 0}
-        ]
-    };
-    res.json(result);
+    let trackid = req.body.trackid;
+    
+    let database = new Database(config);
+    let sql = `
+                SELECT users.name AS user_id, score
+			FROM report LEFT JOIN users
+				ON report.user_id = users.user_id
+			WHERE track_id = ${trackid}
+    			ORDER BY score DESC
+            `;
+
+    database.query(sql).then(result => {
+        let send = {
+            leaderboard: result
+        };
+        res.json(send);
+    })
+    database.close();
 });
 
 // interviews
@@ -305,6 +339,103 @@ app.get('/interviews', (req, res) => {
         database.close();
     });
 });
+
+// accept interview
+app.post('/accept-interview', (req, res) => {
+    let notFound = false;
+    if (notFound) res.status(400).send('The accept-interview with the given parameters are not found.');
+    let userid = req.query.userid;
+    let interviewid = req.query.interviewid;
+
+    let database = new Database(config);
+
+    let sql = `
+            UPDATE interview_request
+                SET status = "accepted"
+                WHERE receiver_id = ${userid}
+                    AND request_id = ${interviewid}
+        `;
+
+    database.query(sql);
+    database.close();
+    res.send();
+});
+
+// decline interview
+app.post('/decline-interview', (req, res) => {
+    let notFound = false;
+    if (notFound) res.status(400).send('The decline-interview with the given parameters are not found.');
+    let userid = req.query.userid;
+    let interviewid = req.query.interviewid;
+
+    let database = new Database(config);
+
+    let sql = `
+            UPDATE interview_request
+                SET status = "declined"
+                WHERE receiver_id = ${userid}
+                    AND request_id = ${interviewid}
+        `;
+
+    database.query(sql);
+    database.close();
+    res.send();
+});
+
+// edit track get
+app.post('/edit-track', (req, res) => {
+    /**
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DO
+    // TO DOs
+    userid: “id of user who created track”
+	track: {
+        trackid: 3
+        name: "editedTrackName"
+        questions: [
+        {id: 40, title: "questionsList40", description:   "blablablablabla", test-cases: [{case-id: 0, case: 1}]
+        },
+        {id: 44, title: "questionsList44", description: "LMAOOO", test-cases: [{case-id: 0, case: 1}]}
+        ]
+        subject: "DP"
+            duration: "35 mins"
+    }
+
+    let userid = req.query.userid;
+    let track = req.query.track;
+
+    let database = new Database(config);
+
+    let sql = `
+        INSERT INTO users (name, email, password, birth_date, type)
+	    VALUES (
+			'${name}',
+            '${email}',
+            '${password}',
+            '${birth_date}',
+            '${role}'
+	        )
+    `; 
+
+    database.query(sql);
+    database.close();
+    res.send();
+     */
+});
+
+
 
 // FUNCTIONS
 // user validation
