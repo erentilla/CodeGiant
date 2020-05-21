@@ -2,12 +2,14 @@ const Joi = require('joi');
 const express = require('express');
 const app = express();
 var mysql = require('mysql');
+var cors = require('cors');
 
 
-
+const API_ENDPOINT = "";
 
 // MIDDLEWARE
 app.use(express.json());
+app.use(cors());
 
 // VARS
 
@@ -28,12 +30,12 @@ let tracks = [];
     
     {// USER ROUTES
         // user get
-        app.get('/api/users', (req, res) => {
+        app.get('/users', (req, res) => {
             res.send(users);
         });
         
         // user post
-        app.post('/api/users', (req, res) => {
+        app.post('/users', (req, res) => {
             const {error} = validateUser(req.body); // result.error
             if(error) return res.status(400).send(result.error.details[0].message);
             
@@ -50,12 +52,19 @@ let tracks = [];
     
     {// TRACK ROUTES
         // track get
-        app.get('/api/tracks', (req, res) => {
-            res.send(tracks);
+        app.get('/tracks', (req, res) => {
+            let result = {
+                "tracks": [
+                    {"id": 0, "name": "track0", "subject": "DFS", "difficulty": "hard", "duration": "5 mins"},
+                    {"id": 3, "name": "track3", "subject": "DFS", "difficulty": "hard", "duration": "15 mins"},
+                    {"id": 4, "name": "track4", "subject": "BFS", "difficulty": "easy", "duration": "52 mins"}
+                ]
+            };
+            res.send(result);
         });
         
         // track post //TO BE DEVELOPED
-        app.post('/api/tracks', (req, res) => {
+        app.post('/tracks', (req, res) => {
             const {error} = validateTrack(req.body); // result.error
             if(error) return res.status(400).send(result.error.details[0].message);
             
@@ -73,41 +82,94 @@ let tracks = [];
     
     {// EXTRA ROUTES
         // log-in get
-        app.get('/api/log-in', (req, res) => {
-            let user = users.find(c => c.userID == req.query.userID && c.password == req.query.password);
-            if (!user) res.status(400).send('The user with the given parameters is not found.');
-            res.json({role: user.role});
+        app.get('/log-in', (req, res) => {
+            let notFound = false;
+            if (notFound) res.status(400).send('The user with the given parameters is not found.');
+            let userid = req.query.userid;
+            let password = req.query.password;
+            console.log('log in - userid: ', userid);
+            console.log('log in - password: ', password);
+            let result = {
+                role: "developer"
+            };
+            res.json(result);
         });
         
         // completed-tracks get //DATABASE CONNECTION
-        app.get('/api/completed-tracks', (req, res) => {
-            let user = users.find(c => c.userID == req.query.userID);
-            if (!user) res.status(400).send('The tracks with the given parameters are not found.');
-            res.json({tracks: []});
+        app.get('/completed-tracks', (req, res) => {
+            let notFound = false;
+            if (notFound) res.status(400).send('The tracks with the given parameters are not found.');
+            let userid = req.query.userid;
+            console.log('completed tracks - userid: ', userid);
+            let result = {
+                "tracks": [
+                    {"id": 0, "name": "track0 completed", "subject": "DFS", "difficulty": "hard", "duration": "5 mins"},
+                    {"id": 3, "name": "track3  completed", "subject": "DFS", "difficulty": "hard", "duration": "15 mins"},
+                    {"id": 4, "name": "track4  completed", "subject": "BFS", "difficulty": "easy", "duration": "52 mins"}
+                ]
+            }
+            res.json(result);
         });
         
         // questions-of-track //DATABASE CONNECTION
-        app.get('/api/questions-of-track', (req, res) => {
-            let track = tracks.tracks.find(c => c.trackID == req.query.trackID);
-            if (!track) res.status(400).send('The track with the given parameters is not found.');
-            res.json({questions: []});
+        app.get('/questions-of-track', (req, res) => {
+            let notFound = false;
+            if (notFound) res.status(400).send('The track with the given parameters is not found.');
+            let trackid = req.query.trackid;
+            console.log('questions of track - trackid: ', trackid);
+            let result = {
+                "questions": [
+                    {"id": 4, "title": "question4", "description": "blablablablabla", "test-cases": [{"case-id": 0, "case": 1}]},
+                    {"id": 0, "title": "question0", "description": "LMAOOO", "test-cases": [{"case-id": 0, "case": 1}]},
+                    {"id": 3, "title": "question3", "description": "XDXDXDXD", "test-cases": [{"case-id": 0, "case": 1}]}
+                ]
+            }
+            res.json(result);
         });
         
         // report get //DATABASE CONNECTION
-        app.get('/api/report', (req, res) => {
-            let user  = users.find(c => c.userID == req.query.userID);
-            let track = tracks.tracks.find(c =>c.trackID == req.query.trackID);
-            if (!user || !track) res.status(400).send('The report with the given parameters are not found.');
-            res.json({total_score: '0'});
+        app.get('/report', (req, res) => {
+            let notFound = false;
+            if (notFound) res.status(400).send('The report with the given parameters are not found.');
+            let userid = req.query.userid;
+            let trackid = req.query.trackid;
+            console.log('report - userid: ', userid);
+            console.log('report - trackid: ', trackid);
+            let result = {
+                "question_results": [
+                    {"question_id": 0, "question_title": "a nice question", "score": 100},
+                    {"question_id": 1, "question_title": "a terrible question", "score": 5}
+                ],
+                "total_score": 90
+            };
+            res.json(result);
         });
         
         // submit-track get PROBLEMATIC
-        app.post('/api/submit-track', (req, res) => {
-            let track = req.params;
-            tracks.tracks.push(track);
-            //res.send({submission: [track.body]});
+        app.post('/submit-track', (req, res) => {
+            let userid = req.body.userid;
+            let submission = req.body.submission;
+            console.log('submit track - userid: ', userid);
+            console.log("submit track - submission: ", submission);
+            res.send();
         });
         
+
+        app.get('/leaderboard', (req, res) => {
+            let notFound = false;
+            if (notFound) res.status(400).send('The leaderboard with the given parameters are not found.');
+            let trackid = req.query.trackid;
+            console.log("leaderboard - trackid: ", trackid);
+            let result = {
+                "leaderboard": [
+                    {"user_id": "baba", "score": 100},
+                    {"user_id": "mehmet", "score": 70},
+                    {"user_id": "lmao", "score": 50},
+                    {"user_id": "alko", "score": 0}
+                ]
+            };
+            res.json(result);
+        });
     }
 }
 
