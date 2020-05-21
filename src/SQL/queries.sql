@@ -8,14 +8,6 @@ INSERT INTO users (name, email, password, birth_date)
             @password,
             @birth_date
 	);
-INSERT INTO user_type (user_id, type)
-	VALUES (
-			(SELECT AUTO_INCREMENT - 1
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = "codegiant"
-				AND TABLE_NAME = "users"),
-			"dev"
-	);
 
 -- Change password
 UPDATE USERS
@@ -29,9 +21,8 @@ UPDATE users
 
 -- Login
 SELECT *
-	FROM users RIGHT JOIN user_type
-    ON users.user_id = user_type.user_id
-    WHERE type = @type AND name = @name AND password = @password;
+	FROM users
+    WHERE name = @name AND password = @password;
 
 -- DEVELOPER QUERIES
 -- Display tracks
@@ -94,10 +85,8 @@ SELECT case_id, input AS test_input, output AS test_output
 INSERT INTO submitted_code (language, code)
 	VALUES ( @lang, @code);
 -- Get id of submission
-SELECT (AUTO_INCREMENT - 1) AS submission_id
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = "codegiant"
-				AND TABLE_NAME = "submitted_code";
+SELECT LAST_INSERT_ID();
+
 -- Create participation
 INSERT INTO participation (track_id, developer_id, question_id, submission_id, start_time, end_time)
 	VALUES (@track_id, @user_id, @question_id, @submission_id, @start_time, @end_time);
@@ -132,10 +121,8 @@ SELECT report.track_id, track.name, subjects.name, difficulty, finish_time AS co
 INSERT INTO question (writer_id, title, question)
 	VALUES ( @user_id, @title, @question);
 -- Get question_id to @q_id
-SELECT (AUTO_INCREMENT - 1) AS question_id
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = "codegiant"
-				AND TABLE_NAME = "question";
+SELECT LAST_INSERT_ID();
+
 -- Assign subject
 INSERT INTO has_subject (question_id, subject_id)
 	VALUES (@q_id,
@@ -191,10 +178,9 @@ INSERT INTO track (writer_id, subject_id, name, difficulty, duration)
 			@track_name,
             @difficulty,
             @duration);
-SELECT (AUTO_INCREMENT - 1) AS track_id
-				FROM information_schema.TABLES
-				WHERE TABLE_SCHEMA = "codegiant"
-				AND TABLE_NAME = "track";
+
+-- Get track id
+SELECT LAST_INSERT_ID();
 
 -- Assess question
 UPDATE question

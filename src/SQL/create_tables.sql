@@ -15,25 +15,19 @@ DROP TABLE IF EXISTS has_subject;
 DROP TABLE IF EXISTS test_case;
 DROP TABLE IF EXISTS question;
 DROP TABLE IF EXISTS subjects;
-DROP TABLE IF EXISTS user_type;
 DROP TABLE IF EXISTS users;
 
 -- Create tables
 -- User related tables
 CREATE TABLE users(
 user_id	int NOT NULL AUTO_INCREMENT,
-name	VARCHAR(20) NOT NULL,
+name	VARCHAR(20) NOT NULL UNIQUE,
 email	VARCHAR(30) NOT NULL,
 password	VARCHAR(20) NOT NULL,
 birth_date	DATETIME,
 user_bio	VARCHAR(100),
-PRIMARY KEY (user_id)
-);
-CREATE TABLE user_type(
-user_id		int not null,
 type		ENUM("dev", "adm", "rep") NOT NULL,
-PRIMARY KEY (user_id),
-CONSTRAINT fk_type_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+PRIMARY KEY (user_id)
 );
 
 -- Question related tables
