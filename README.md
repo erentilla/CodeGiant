@@ -2,4 +2,7 @@
 Database Systems Course Project
 
 # Documentation
-To see documentation, please check [our website](https://erentilla.github.io/)
+You can see the documentation in the /docs file.
+
+# Client
+The client side of the project can be found at: https://github.com/talhaburakc/CodeGiant-Client
